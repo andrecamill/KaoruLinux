@@ -2,40 +2,35 @@
 
 A minimal, bare-bones Linux distribution environment featuring **BusyBox**, **musl libc**, and the **Tiny C Compiler (TCC)**.
 
+KaoruLinux is meant to be a simple Linux distribution made to learn how to easily build something from scratch starting from the Linux kernel.
+KaoruLinux features upstream Linux kernel, standard C library musl and TinyCC, a small C compiler.
 
-**🛠 Features**
+**Required Setup**
 
-* **Kernel:** Upstream Linux Kernel.  
-* **Base Utilities:** [BusyBox](https://busybox.net/) (multi-call binary for standard UNIX tools).  
-* **C Library:** [musl libc](https://musl.libc.org/) (lightweight, fast, and simple).  
-* **Compiler:** [TCC](https://bellard.org/tcc/) (Tiny C Compiler) for on-target ANSI C development.  
-* **Shell:** oksh (OpenBSD Korn Shell port) as the default interactive shell.
+Kernel and BusyBox compilation are required.
 
-**Required Manual Steps**
+### **Prerequisites & Kernel Compilation**
 
-Kernel and BusyBox manual compilation are required.
+Clone the repository and initialize the submodules.
+It is raccomended to use the flag `--depth=1` when cloning submodules to save space by only cloning last commit of every submodule repo.
 
-### **1\. Prerequisites & Kernel Compilation**
-
-Clone the repository and initialize the submodules. It is recommended to use an x86\_64 host.
-
-\# Clone submodules (shallow clone for the kernel to save space)  
+#### Clone submodules 
 `git submodule update --init --depth=1`
 
-\# Compile the Linux Kernel  
+#### Compile the Linux Kernel  
 `cd linux/`  
 `make -j$(nproc)`  
 
-\# The bzImage will be generated in arch/x86/boot/bzImage (for x86\_64)  
+Kernel image will be built in arch/x86/boot/bzImage (for x86\_64)  
 
-### **2\. BusyBox Setup**
+### **BusyBox Setup**
 
 BusyBox provides the core userland utilities.
 
-1. Enter the busybox/ directory.  
-2. Run make menuconfig.  
-3. Enable Settings \-\> Build static binary (no shared libs).  
-4. Run `make -j$(nproc)`  
+In order to correctly compile BusyBox, enter menuconfig with `make menuconfig` and flag the `Build static binary (no shared lib)` box.
+This is required as I still not (correctly) implemented shared libraries. 
+
+After configuration is done, run `make -j$(nproc)`
 
 **Build Instructions**
 
@@ -43,16 +38,14 @@ Run `genall`
 
 **Testing**
 
-You can easily test your build using **QEMU**:
+You can easily test your build using QEMU emulator
 
 ```bash
 make qemu
 ```
 
-## ---
+**Warnings**
 
-**📝 Notes**
-
-* **linuxrc:** You can safely remove the linuxrc file from boot/rootfs as it is not strictly necessary for this initramfs setup.  
-* **Static Linking:** Always ensure userland tools are statically linked if you haven't properly configured the dynamic linker path in the rootfs.
+You can remove the generated "linuxrc" file.
+As of right now, any userspace utility needs to be compiled in static binary. 
 
